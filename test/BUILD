@@ -4,3 +4,10 @@ cc_binary(
     'file.cc',
   ],
 )
+
+cc_binary(
+  name = 'rapidjson',
+  srcs = [
+    'rapidjson.cc',
+  ],
+)
