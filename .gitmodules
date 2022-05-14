@@ -9,3 +9,6 @@
   path = thirdparty/Catch2
   url = https://github.com/catchorg/Catch2.git
   branch = v2.x
+[submodule "thirdparty/rapidjson"]
+	path = thirdparty/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
