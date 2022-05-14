@@ -1,6 +1,6 @@
 cc_binary(
-  name = 'fibonacci',
+  name = 'file',
   srcs = [
-    'fibonacci.cc',
+    'file.cc',
   ],
 )

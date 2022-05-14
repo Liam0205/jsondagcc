@@ -15,32 +15,24 @@
 // limitations under the License.
 // =========================================================================
 
+#include "jsondag/helper/file.h"
+
 #include <catch.h>
 
-#include <cstdint>
+#include <cstdio>
 
-std::uint64_t Fibonacci(std::uint64_t number) {
-  return number < 2 ? 1 : Fibonacci(number - 1) + Fibonacci(number - 2);
+TEST_CASE("File") {
+  jsondag::helper::File f("./test/cases/basic.json", "r");
+  REQUIRE_FALSE(nullptr == f);        // derived from std::unique_ptr<std::FILE, DELETER>
+  REQUIRE_FALSE(nullptr == f());      // raw std::FILE*
+  REQUIRE_FALSE(nullptr == f.get());  // raw std::FILE*
 }
 
-TEST_CASE("Fibonacci") {
-  REQUIRE(Fibonacci(0) == 1);
-  REQUIRE_FALSE(Fibonacci(5) == 7);  // actural should be `8`.
-
-  // now let's benchmark:
-  BENCHMARK("Fibonacci 10") {
-    return Fibonacci(10);
-  };
-
-  BENCHMARK("Fibonacci 25") {
-    return Fibonacci(25);
-  };
-
-  BENCHMARK("Fibonacci 30") {
-    return Fibonacci(30);
-  };
-
-  BENCHMARK("Fibonacci 35") {
-    return Fibonacci(35);
-  };
+TEST_CASE("File Reading") {
+  jsondag::helper::File f("./test/cases/basic.json", "r");
+  REQUIRE_FALSE(nullptr == f);
+  int c;
+  while ((c = std::fgetc(f())) != EOF && c == ' ' && c == '\n' && c == '\t') {
+  }
+  REQUIRE(c == '[');  // first valid char should be left bracket.
 }
