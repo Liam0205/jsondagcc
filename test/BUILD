@@ -18,3 +18,10 @@ cc_binary(
     'node.cc',
   ],
 )
+
+cc_binary(
+  name = 'jsondag',
+  srcs = [
+    'jsondag.cc',
+  ],
+)
