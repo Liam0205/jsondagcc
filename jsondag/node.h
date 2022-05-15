@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "rapidjson/document.h"
@@ -89,6 +90,10 @@ class Node {
     return true;
   }
 
+  std::vector<std::string>* mutable_successors() {
+    return &successors_;
+  }
+
  public:
   bool valid() const {
     return id_ != std::numeric_limits<uint64_t>::max();
@@ -102,11 +107,19 @@ class Node {
     return name_;
   }
 
-  uint64_t in_order() const {
+  const std::vector<std::string>& predecessors() const {
+    return predecessors_;
+  }
+
+  const std::vector<std::string>& successors() const {
+    return successors_;
+  }
+
+  uint64_t in_degree() const {
     return predecessors_.size();
   }
 
-  uint64_t out_order() const {
+  uint64_t out_degree() const {
     return successors_.size();
   }
 

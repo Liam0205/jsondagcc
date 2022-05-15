@@ -28,7 +28,7 @@
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/rapidjson.h"
 
-TEST_CASE("rapidjson.DOM-manipulate") {
+TEST_CASE("node.basic") {
   jsondag::helper::File f("./test/cases/basic.json", "r");
   char buffer[65536];
   rapidjson::FileReadStream is(f(), buffer, sizeof(buffer));
@@ -43,24 +43,24 @@ TEST_CASE("rapidjson.DOM-manipulate") {
     REQUIRE(node.valid());
     if (node.name() == "A") {
       REQUIRE(node.id() == 0);
-      REQUIRE(node.in_order() == 0);
+      REQUIRE(node.in_degree() == 0);
       jsondag::Node new_node;
       new_node = std::move(node);
       REQUIRE(new_node.valid());
       REQUIRE_FALSE(node.valid());
       REQUIRE(new_node.id() == 0);
-      REQUIRE(new_node.in_order() == 0);
+      REQUIRE(new_node.in_degree() == 0);
     } else if (node.name() == "B") {
       REQUIRE(node.id() == 1);
-      REQUIRE(node.in_order() == 2);
+      REQUIRE(node.in_degree() == 2);
       jsondag::Node new_node(std::move(node));
       REQUIRE(new_node.valid());
       REQUIRE_FALSE(node.valid());
       REQUIRE(new_node.id() == 1);
-      REQUIRE(new_node.in_order() == 2);
+      REQUIRE(new_node.in_degree() == 2);
     } else if (node.name() == "C") {
       REQUIRE(node.id() == 2);
-      REQUIRE(node.in_order() == 0);
+      REQUIRE(node.in_degree() == 0);
     } else {
       REQUIRE(false);
     }
