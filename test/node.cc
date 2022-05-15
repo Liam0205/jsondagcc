@@ -15,7 +15,7 @@
 // limitations under the License.
 // =========================================================================
 
-#include "rapidjson/rapidjson.h"
+#include "jsondag/node.h"
 
 #include <catch.h>
 
@@ -26,6 +26,7 @@
 #include "jsondag/helper/file.h"
 #include "rapidjson/document.h"
 #include "rapidjson/filereadstream.h"
+#include "rapidjson/rapidjson.h"
 
 TEST_CASE("rapidjson.DOM-manipulate") {
   jsondag::helper::File f("./test/cases/basic.json", "r");
@@ -34,35 +35,23 @@ TEST_CASE("rapidjson.DOM-manipulate") {
   rapidjson::Document d;
   d.ParseStream(is);
   REQUIRE(d.IsArray());
+  ¡ uint64_t id = 0UL;
   for (auto& obj : d.GetArray()) {
     REQUIRE(obj.IsObject());
-    rapidjson::Value::ConstMemberIterator itr = obj.FindMember("name");
-    REQUIRE(obj.MemberEnd() != itr);
-    REQUIRE(itr->value.IsString());
-
-    itr = obj.FindMember("deps");
-    if (obj.MemberEnd() != itr) {
-      REQUIRE(itr->value.IsArray());
-      for (auto& ele : itr->value.GetArray()) {
-        REQUIRE(ele.IsString());
-      }
+    jsondag::Node node(id++, obj);
+    REQUIRE(node.parse());
+    REQUIRE(node.valid());
+    if (node.name() == "A") {
+      REQUIRE(node.id() == 0);
+      REQUIRE(node.in_order() == 0);
+    } else if (node.name() == "B") {
+      REQUIRE(node.id() == 1);
+      REQUIRE(node.in_order() == 2);
+    } else if (node.name() == "C") {
+      REQUIRE(node.id() == 2);
+      REQUIRE(node.in_order() == 0);
+    } else {
+      REQUIRE(false);
     }
-  }
-}
-
-TEST_CASE("rapidjson.DOM-store in vector") {
-  jsondag::helper::File f("./test/cases/basic.json", "r");
-  char buffer[65536];
-  rapidjson::FileReadStream is(f(), buffer, sizeof(buffer));
-  rapidjson::Document d;
-  d.ParseStream(is);
-  REQUIRE(d.IsArray());
-  std::vector<rapidjson::Value> vals;
-  vals.resize(d.Size());
-  int i = 0;
-  for (auto& obj : d.GetArray()) {
-    REQUIRE(obj.IsObject());
-    vals[i].CopyFrom(obj, d.GetAllocator());
-    REQUIRE(vals[i++] == obj);
   }
 }

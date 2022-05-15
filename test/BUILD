@@ -11,3 +11,10 @@ cc_binary(
     'rapidjson.cc',
   ],
 )
+
+cc_binary(
+  name = 'node',
+  srcs = [
+    'node.cc',
+  ],
+)
