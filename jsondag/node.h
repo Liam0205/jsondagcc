@@ -36,10 +36,32 @@ class Node {
   std::string json_str_;
 
  public:
-  Node() = delete;
+  Node() = default;
   Node(uint64_t id, rapidjson::Value& json_val) : id_(id) {
     json_val_ = json_val;
   }
+  Node(const Node&) = delete;
+  Node& operator=(const Node&) = delete;
+  Node(Node&& rhs)
+      : id_(rhs.id_),
+        name_(std::move(rhs.name_)),
+        predecessors_(std::move(rhs.predecessors_)),
+        successors_(std::move(rhs.successors_)),
+        json_str_(std::move(rhs.json_str_)) {
+    rhs.id_ = std::numeric_limits<uint64_t>::max();
+    json_val_ = rhs.json_val_;  // move by default
+  }
+  Node& operator=(Node&& rhs) {
+    id_ = rhs.id_;
+    rhs.id_ = std::numeric_limits<uint64_t>::max();
+    json_val_ = rhs.json_val_;  // move by default
+    name_ = std::move(rhs.name_);
+    predecessors_ = std::move(rhs.predecessors_);
+    successors_ = std::move(rhs.successors_);
+    json_str_ = std::move(rhs.json_str_);
+    return *this;
+  }
+  virtual ~Node() = default;
 
  public:
   bool parse() {

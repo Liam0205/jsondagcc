@@ -35,7 +35,7 @@ TEST_CASE("rapidjson.DOM-manipulate") {
   rapidjson::Document d;
   d.ParseStream(is);
   REQUIRE(d.IsArray());
-  ¡ uint64_t id = 0UL;
+  uint64_t id = 0UL;
   for (auto& obj : d.GetArray()) {
     REQUIRE(obj.IsObject());
     jsondag::Node node(id++, obj);
@@ -44,9 +44,20 @@ TEST_CASE("rapidjson.DOM-manipulate") {
     if (node.name() == "A") {
       REQUIRE(node.id() == 0);
       REQUIRE(node.in_order() == 0);
+      jsondag::Node new_node;
+      new_node = std::move(node);
+      REQUIRE(new_node.valid());
+      REQUIRE_FALSE(node.valid());
+      REQUIRE(new_node.id() == 0);
+      REQUIRE(new_node.in_order() == 0);
     } else if (node.name() == "B") {
       REQUIRE(node.id() == 1);
       REQUIRE(node.in_order() == 2);
+      jsondag::Node new_node(std::move(node));
+      REQUIRE(new_node.valid());
+      REQUIRE_FALSE(node.valid());
+      REQUIRE(new_node.id() == 1);
+      REQUIRE(new_node.in_order() == 2);
     } else if (node.name() == "C") {
       REQUIRE(node.id() == 2);
       REQUIRE(node.in_order() == 0);
