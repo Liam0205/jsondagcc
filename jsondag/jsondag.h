@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <stack>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
 
@@ -28,10 +29,12 @@
 #include "rapidjson/filereadstream.h"
 
 namespace jsondag {
+template <typename NodeType = Node,
+          std::enable_if_t<std::is_base_of<Node, NodeType>::value, bool> = true>
 class JsonDag {
  private:
   std::string json_fname_;
-  std::vector<Node> nodes_;
+  std::vector<NodeType> nodes_;
   std::unordered_map<std::string, size_t> node_map_;
   std::vector<size_t> topological_sorted_;
 
@@ -39,6 +42,10 @@ class JsonDag {
   JsonDag() = default;
   explicit JsonDag(const std::string& fname) : json_fname_(fname) {
   }
+  JsonDag(const JsonDag&) = delete;
+  JsonDag& operator=(const JsonDag&) = delete;
+  JsonDag(JsonDag&&) = default;
+  JsonDag& operator=(JsonDag&&) = default;
   ~JsonDag() = default;
 
  public:
@@ -64,7 +71,7 @@ class JsonDag {
   }
 
  private:
-  bool _build_nodes(rapidjson::Document& d) {
+  bool _build_nodes(rapidjson::Document& d) {  // NOLINT
     uint64_t id = 0UL;
     nodes_.reserve(d.Size());
     for (auto& obj : d.GetArray()) {
@@ -144,6 +151,23 @@ class JsonDag {
 
   const std::string& json_fname() const {
     return json_fname_;
+  }
+
+  const std::vector<NodeType>& nodes() const {
+    return nodes_;
+  }
+
+  const std::unordered_map<std::string, size_t> node_map() const {
+    return node_map_;
+  }
+
+  const std::vector<size_t>& topological_sorted() const {
+    return topological_sorted_;
+  }
+
+ public:
+  std::vector<NodeType>* mutable_nodes() {
+    return &nodes_;
   }
 };
 }  // namespace jsondag

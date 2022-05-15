@@ -19,7 +19,42 @@
 
 #include <catch.h>
 
+#include <algorithm>
+#include <iterator>
+#include <sstream>
+
 TEST_CASE("jsondag.basic") {
-  jsondag::JsonDag jd("./test/cases/basic.json");
+  const char* basic_json = "./test/cases/basic.json";
+  jsondag::JsonDag jd(basic_json);
+  REQUIRE_FALSE(jd.valid());
+  REQUIRE(basic_json == jd.json_fname());
   REQUIRE(jd.parse());
+  REQUIRE(jd.valid());
+
+  const auto& nodes = jd.nodes();
+  for (auto& node : nodes) {
+    REQUIRE(node.valid());
+    if (node.name() == "A") {
+      REQUIRE(node.id() == 0);
+      REQUIRE(node.in_degree() == 0);
+      REQUIRE(node.out_degree() == 1);
+    } else if (node.name() == "B") {
+      REQUIRE(node.id() == 1);
+      REQUIRE(node.in_degree() == 2);
+      REQUIRE(node.out_degree() == 0);
+    } else if (node.name() == "C") {
+      REQUIRE(node.id() == 2);
+      REQUIRE(node.in_degree() == 0);
+      REQUIRE(node.out_degree() == 1);
+    } else {
+      REQUIRE(false);
+    }
+  }
+
+  const std::vector<size_t>& sorted = jd.topological_sorted();
+  std::ostringstream oss;
+  std::transform(sorted.begin(), sorted.end(),
+                 std::ostream_iterator<std::string>(oss, ","),
+                 [&nodes](size_t i) { return nodes[i].name(); });
+  REQUIRE(oss.str() == "C,A,B,");
 }
